@@ -87,7 +87,7 @@ func CreateEntry(c *gin.Context) {
 
 	// Send POST request to Kubo API
 	resp, err := http.Post(
-		"http://ipfs-kubo:5001/api/v0/add?pin=true", // <-- Add this
+		"http://ipfs-service:5001/api/v0/add?pin=true", // <-- Add this
 		writer.FormDataContentType(),
 		&buf,
 	)
@@ -145,7 +145,7 @@ func GetEntry(c *gin.Context) {
 		return
 	}
 
-	resp, err := http.Get("http://ipfs-kubo:8080/ipfs/" + entry.CID)
+	resp, err := http.Get("http://ipfs-service:8080/ipfs/" + entry.CID)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to fetch from IPFS"})
 		return
