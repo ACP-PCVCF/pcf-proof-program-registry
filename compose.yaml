@@ -1,15 +1,17 @@
 services:
-  proof-program-lookup:
+  proof-program-registry:
+    container_name: proof-program-registry
     build:
       context: .
     ports:
       - "6005:8080"  # Exposes your app on port 6005
     depends_on:
-      - ipfs-kubo    # Ensures IPFS starts first
+      - ipfs-service    # Ensures IPFS starts first
     tty: true
     stdin_open: true
 
-  ipfs-kubo:
+  ipfs-service:
+    container_name: ipfs-service
     image: ipfs/kubo:v0.35.0
     ports:
       - "4001:4001"
