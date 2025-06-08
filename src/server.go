@@ -54,19 +54,22 @@ func CreateEntry(c *gin.Context) {
 	db, err := ConnectToDatabase()
 
 	if err != nil {
-		panic("wowzers")
+		c.JSON(400, gin.H{"error": "Database Error" + err.Error()})
+		return
 	}
 
 	fileheader, err := c.FormFile("file")
 
 	if err != nil {
-		panic("wowzzzers")
+		c.JSON(400, gin.H{"error": "File Error" + err.Error()})
+		return
 	}
 
 	src, err := fileheader.Open()
 
 	if err != nil {
-		panic(err)
+		c.JSON(400, gin.H{"error": "Couldnt open Fileheader" + err.Error()})
+		return
 	}
 	defer src.Close()
 
@@ -76,13 +79,15 @@ func CreateEntry(c *gin.Context) {
 
 	part, err := writer.CreateFormFile("file", "myimage.jpg")
 	if err != nil {
-		panic(err)
+		c.JSON(500, gin.H{"error": "Formfile error" + err.Error()})
+		return
 	}
 
 	_, err = io.Copy(part, src)
 
 	if err != nil {
-		panic(err)
+		c.JSON(500, gin.H{"error": "Couldnt copy file" + err.Error()})
+		return
 	}
 
 	// Send POST request to Kubo API
@@ -92,7 +97,8 @@ func CreateEntry(c *gin.Context) {
 		&buf,
 	)
 	if err != nil {
-		panic(err)
+		c.JSON(500, gin.H{"error": "Request to ipfs failed" + err.Error()})
+		return
 	}
 	writer.Close()
 	var ipfsResp struct {
@@ -102,16 +108,15 @@ func CreateEntry(c *gin.Context) {
 	// Parse IPFS response
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		c.JSON(500, gin.H{"error": "Request to ipfs failed" + err.Error()})
+		return
 	}
 
 	if err := json.Unmarshal(body, &ipfsResp); err != nil {
-		panic(err)
+		c.JSON(500, gin.H{"error": "Request to ipfs failed" + err.Error()})
+		return
 	}
 
-	if err != nil {
-		panic(err)
-	}
 	defer resp.Body.Close()
 
 	//TODO: Afterwards save CID, and Image Id in database (is to be replaced at the end by smart contracts on blockchaiis to be replaced at the end by smart contracts on blockchainn)
@@ -122,7 +127,7 @@ func CreateEntry(c *gin.Context) {
 	}
 
 	if err := db.Create(&entry).Error; err != nil {
-		c.JSON(500, gin.H{"error": "failed to save to database"})
+		c.JSON(500, gin.H{"error": "failed to save to ipfs"})
 		return
 	}
 
@@ -135,19 +140,20 @@ func GetEntry(c *gin.Context) {
 
 	db, err := ConnectToDatabase()
 	if err != nil {
-		panic("asdsa")
+		c.JSON(500, gin.H{"error": "Could not connect to ipfs server" + err.Error()})
+		return
 	}
 
 	var entry Entry
 	err = db.First(&entry, "image_id = ?", imageID).Error
 	if err != nil {
-		c.JSON(404, gin.H{"error": "Entry not found"})
+		c.JSON(404, gin.H{"error": "Entry not found" + err.Error()})
 		return
 	}
 
 	resp, err := http.Get("http://ipfs-service:8080/ipfs/" + entry.CID)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to fetch from IPFS"})
+		c.JSON(500, gin.H{"error": "Failed to fetch from IPFS. Error:" + string(err.Error())})
 		return
 	}
 	defer resp.Body.Close()
