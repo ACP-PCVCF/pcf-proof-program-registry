@@ -47,6 +47,7 @@ func CreateEntry(c *gin.Context) {
 	image_id := c.Query("image_id")
 
 	if image_id == "" {
+
 		c.JSON(400, gin.H{"error": "imageId query parameter is required"})
 		return
 	}
@@ -157,6 +158,10 @@ func GetEntry(c *gin.Context) {
 		return
 	}
 	defer resp.Body.Close()
+
+	c.Header("Content-Type", "application/zip")
+	c.Header("Content-Disposition", `attachment; filename="proof.zip"`)
 	io.Copy(c.Writer, resp.Body)
+
 	//return "http://localhost:8080/ipfs/" + entry.CID or send file out directly
 }
