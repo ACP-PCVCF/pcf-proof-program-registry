@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proof-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proof-registry
+  template:
+    metadata:
+      labels:
+        app: proof-registry
+    spec:
+      containers:
+      - name: app
+        image: ghcr.io/acp-pcvcf/pcf-proof-program-registry:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: ipfs-storage
+          mountPath: /data
+        env:
+        - name: DATABASE_PATH
+          value: /data/db.sqlite
+      volumes:
+      - name: ipfs-storage
+        persistentVolumeClaim:
+          claimName: proof-registry
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: proof-registry
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proof-program-registry
+spec:
+  type: LoadBalancer
+  selector:
+    app: proof-registry
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30808  
