@@ -1,20 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: proof-registry
+  name: {{ .Values.registryService.name }}-deployment 
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: proof-registry
+      app: {{ .Values.registryService.name }}
   template:
     metadata:
       labels:
-        app: proof-registry
+        app: {{ .Values.registryService.name }}
     spec:
       containers:
-      - name: app
-        image: ghcr.io/acp-pcvcf/pcf-proof-program-registry:latest
+      - name: proof-program-registry-service
+        image: {{ .Values.registryService.image }}
         ports:
         - containerPort: 8080
         volumeMounts:
@@ -26,13 +27,14 @@ spec:
       volumes:
       - name: ipfs-storage
         persistentVolumeClaim:
-          claimName: proof-registry
+          claimName: {{ .Values.registryService.name }}
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: proof-registry
+  name: {{ .Values.registryService.name }}-pvc 
+  namespace: {{ .Values.namespace }}
 spec:
   accessModes:
     - ReadWriteOnce
@@ -44,11 +46,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: proof-program-registry
+  name: {{ .Values.registryService.name }}-service
+  namespace: {{ .Values.namespace }}
 spec:
   type: LoadBalancer
   selector:
-    app: proof-registry
+    app: {{ .Values.registryService.name }}
   ports:
     - protocol: TCP
       port: 8080
