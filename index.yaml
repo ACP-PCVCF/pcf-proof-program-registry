@@ -1,5 +1,16 @@
 apiVersion: v1
 entries:
+  pcf-proof-program-registry:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-08-16T12:06:14.193845342Z"
+    description: A Helm chart for Kubernetes
+    digest: c1f7855e38074e2d077ac564112aebcfd5ace365c188ae09b7eff320c7444026
+    name: pcf-proof-program-registry
+    type: application
+    urls:
+    - https://github.com/ACP-PCVCF/pcf-proof-program-registry/releases/download/pcf-proof-program-registry-0.1.0/pcf-proof-program-registry-0.1.0.tgz
+    version: 0.1.0
   proof-program-registry:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -11,4 +22,4 @@ entries:
     urls:
     - https://github.com/ACP-PCVCF/pcf-proof-program-registry/releases/download/proof-program-registry-0.1.0/proof-program-registry-0.1.0.tgz
     version: 0.1.0
-generated: "2025-08-15T22:31:21.563224724Z"
+generated: "2025-08-16T12:06:14.193850211Z"
