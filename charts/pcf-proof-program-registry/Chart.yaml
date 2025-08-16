@@ -1,5 +1,5 @@
 apiVersion: v2
-name: proof-program-registry
+name: pcf-proof-program-registry
 description: A Helm chart for Kubernetes
 type: application
 version: 0.1.0
